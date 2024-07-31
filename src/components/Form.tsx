@@ -1,20 +1,28 @@
 import { categories } from "../data/categories"
+import { Activity } from "../types"
 import { useState } from "react"
 
 const Form = () => {
 
-    const [activity, setActivity]=useState({
-        category:'1',
+    const [activity, setActivity]=useState<Activity> ({
+        category:1,
         name: '',
         calories: 0
 
     })
 
     const handleChange = (e:React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>) =>{ /* Ya que mas abajo hay dos tipos de elementos que usan e, 1 input y un select */
+        const isNumberField = ['category', 'activity'].includes(e.target.id)
+        
         setActivity({
             ...activity,
-            [e.target.id]: e.target.value
+            [e.target.id]: isNumberField ? +e.target.value : e.target.value
         })
+    }
+
+    const isValidActivity =()=>{
+        const {name, calories}=activity
+        return name.trim() !== '' && calories > 0
     }
 
   return (
@@ -57,8 +65,10 @@ const Form = () => {
         </div>
 
         <input type="submit" 
-        className="bg-gray-800 hover:bg-gray-900 w-full p-2 font-bold uppercase text-white cursor-pointer"
+        className="bg-gray-800 hover:bg-gray-900 w-full p-2 font-bold uppercase text-white cursor-pointer
+        disabled:opacity-10"
         value="Guardar Comida o Guardar Ejercicio"
+        disabled={!isValidActivity()}
         />
 
     </form>
