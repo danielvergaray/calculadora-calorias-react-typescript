@@ -1,19 +1,30 @@
 import { categories } from "../data/categories"
+import { v4 as uuidv4} from 'uuid'
+import { ActivityActions } from "../reducers/activivy-reducer"
 import { Activity } from "../types"
-import { useState } from "react"
+import { Dispatch, useState } from "react"
 
-const Form = () => {
 
-    const [activity, setActivity]=useState<Activity> ({
+type FormProps = {
+    dispatch: Dispatch<ActivityActions>
+}
+
+
+
+const Form = ({dispatch}: FormProps) => {
+
+    const initialState : Activity = {
+        id: uuidv4(),
         category:1,
         name: '',
         calories: 0
-
-    })
+    }
+    
+    const [activity, setActivity]=useState<Activity> (initialState)
 
     const handleChange = (e:React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>) =>{ /* Ya que mas abajo hay dos tipos de elementos que usan e, 1 input y un select */
         const isNumberField = ['category', 'activity'].includes(e.target.id)
-        
+      
         setActivity({
             ...activity,
             [e.target.id]: isNumberField ? +e.target.value : e.target.value
@@ -25,9 +36,18 @@ const Form = () => {
         return name.trim() !== '' && calories > 0
     }
 
+    const handleSubmit =(e: React.FormEvent<HTMLFormElement>)=>{
+        e.preventDefault()
+
+        dispatch({ type: 'save-activity', payload: {newActivivy: activity }})
+
+        setActivity (initialState)
+    }
+
   return (
     <form
     className="space-y-5 bg-white shadow p-10 rounded-lg"
+    onSubmit={handleSubmit}
     >
         <div className="grid grid-cols-1 gap-3">
             <label htmlFor="category" className="font-bold">Categoria:</label>
@@ -67,7 +87,7 @@ const Form = () => {
         <input type="submit" 
         className="bg-gray-800 hover:bg-gray-900 w-full p-2 font-bold uppercase text-white cursor-pointer
         disabled:opacity-10"
-        value="Guardar Comida o Guardar Ejercicio"
+        value={activity.category === 1 ? 'Guardar Comida' : 'Guardar Ejercicio'}
         disabled={!isValidActivity()}
         />
 
