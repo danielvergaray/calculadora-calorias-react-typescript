@@ -1,17 +1,18 @@
 import { categories } from "../data/categories"
 import { v4 as uuidv4} from 'uuid'
-import { ActivityActions } from "../reducers/activivy-reducer"
+import { ActivityActions, ActivityState } from "../reducers/activivy-reducer"
 import { Activity } from "../types"
-import { Dispatch, useState } from "react"
+import { Dispatch, useState, useEffect } from "react"
 
 
 type FormProps = {
-    dispatch: Dispatch<ActivityActions>
+    dispatch: Dispatch<ActivityActions>,
+    state: ActivityState
 }
 
 
 
-const Form = ({dispatch}: FormProps) => {
+const Form = ({dispatch, state}: FormProps) => {
 
     const initialState : Activity = {
         id: uuidv4(),
@@ -21,6 +22,13 @@ const Form = ({dispatch}: FormProps) => {
     }
     
     const [activity, setActivity]=useState<Activity> (initialState)
+
+    useEffect(()=>{
+        if(state.activeId){
+            const selectedActivity = state.activities.filter( stateActivity => stateActivity.id === state.activeId)[0]
+            setActivity(selectedActivity)
+        }
+    }, [state.activeId])
 
     const handleChange = (e:React.ChangeEvent<HTMLSelectElement> | React.ChangeEvent<HTMLInputElement>) =>{ /* Ya que mas abajo hay dos tipos de elementos que usan e, 1 input y un select */
         const isNumberField = ['category', 'activity'].includes(e.target.id)
